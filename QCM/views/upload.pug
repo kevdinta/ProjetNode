@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Upload
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+  body
+    div.container
+      h1 Upload
+      hr
+      div.col-lg-12.col-md-10.col-sm-8.col-xs-6
+        div.row
+          form(action='', enctype='multipart/form-data', method='POST', id='form')
+            div.form-group
+              label(for='uploadFile') Uploader un fichier
+              input(type='file', id='uploadFile', class='btn btn-default', accept='.json')
+              br
+              input(type='submit', value='Uploader', class='btn btn-default')
+              p(id='confirmation')
+              script(src='/socket.io/socket.io.js')
+              script(src='js/upload.js')

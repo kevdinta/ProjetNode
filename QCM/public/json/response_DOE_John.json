@@ -1,0 +1,21 @@
+{
+  "name": "John Doe",
+  "date": "20170222",
+  "score": "50",
+  "responses": [
+    {
+      "question": "Quelle est la couleur du cheval blanc d'Henri IV ?",
+      "success": true,
+      "responses": [
+        "Blanc"
+      ]
+    },
+    {
+      "question": "Citer une des trois couleurs du drapeau français.",
+      "success": false,
+      "responses": [
+        "bleu blanc rouge"
+      ]
+    }
+  ]
+}

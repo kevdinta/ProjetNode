@@ -1,0 +1,21 @@
+html
+  head
+    title= title
+    head
+      link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+  body
+    div.container
+      h1= message
+      hr
+      div.col-lg-12.col-md-10.col-sm-8.col-xs-6
+        div.row
+          div.jumbotron
+            form(method='POST', action='/play', class='form-group')
+              label(for='prenom') Prenom
+              input(type='text', class='form-control', id='prenom', placeholder='Votre prénom', required)
+              label(for='nom') Nom
+              input(type='text', class='form-control', id='nom', placeholder='Votre nom', required)
+              br
+              input(type='submit', class='btn btn-warning form-control', value='S\'enregistrer', id='enregistrer')
+      script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+      script(src='/socket.io/socket.io.js')
