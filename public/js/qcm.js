@@ -38,9 +38,6 @@ const writeQuestion = () => {
 
   startQuestionTimer();
   questionBloc.innerHTML = currentQcm[questionNumber].question;
-  while (answerBloc.firstChild) {
-    answerBloc.removeChild(answerBloc.firstChild);
-  }
 
   switch (currentQcm[questionNumber].type) {
     case ('choice'):
@@ -102,7 +99,9 @@ const checkAnswer = () => {
 const nextQuestion = () => {
   clearInterval(questionTimer);
   resultCandidat.answers.push(checkAnswer());
-
+  while (answerBloc.firstChild) {
+    answerBloc.removeChild(answerBloc.firstChild);
+  }
   if (questionNumber + 1 >= currentQcm.length) {
     document.querySelector("#countdowntimer").style.display = "none"
     nextQuestionButton.value = "Terminé"
