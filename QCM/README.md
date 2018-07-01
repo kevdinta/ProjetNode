@@ -1,8 +1,12 @@
-Comment démarrer l'application ?
+# QCM node app
 
-- Démarrez votre invité de commande avec les touches WIN+R et taper 'cmd'
-- Dirigez-vous vers le chemin du fichier serveur.js via la commande cd
-- Ecrivez 'node serveur.js' pour démarrer le serveur
+```bash
+# Installeles dépendences du projet
+npm install
+# Lance  l'application
+npm start
+```
+
 - Lancez désormais votre navigateur préféré, renseignez dans la barre d'adresse 'localhost:2000'
 - Une fois sur la page d'accueil, vous pouvez renseigner votre nom et prénom pour accéder au QCM
 - Sur ce QCM, il y aura un timer, vous devez répondre aux questions, une seule réponse possible demandé

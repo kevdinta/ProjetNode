@@ -7,11 +7,12 @@ html
     div.container
       h1= message
       hr
-      div.col-lg-12.col-md-10.col-sm-8.col-xs-6
+      div.col-xs-12
         div.row
           div.jumbotron
             form(method='POST', action='', class='form-group', name='form')
-              p(id='questions')
+              h2.row(id='question')
+              p(id='answer')
               div(id='countdowntimer')
         input(type='submit',class='btn btn-default', id='suivant' value='Question suivante')
       script(src='/socket.io/socket.io.js')

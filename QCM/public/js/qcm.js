@@ -1,151 +1,123 @@
-let socket = io.connect('http://localhost:2000');
-socket.emit('message', 'J\'ai renseigné mon nom et prénom, je vais pouvoir faire le QCM')
-let bloc = document.querySelector('#questions')
-let suivant = document.querySelector("#suivant")
-socket.on('qcm', (obj) => {
-  let question = obj.question
-  let choices = obj.choices
-  let chiffre = 0
-  let timeleft
-  let questionTimer
-  let date = new Date()
-  let success = 0
-  let note
-  let radios = bloc.children
-  let resultCandidat = "{\n \"name\" : \" "
-      resultCandidat+= ""
-      resultCandidat+="\"\n"
-      resultCandidat+="\"date\" : \""
-      resultCandidat+= date
-      resultCandidat+= "\"\n"
-      resultCandidat+="\"score\" : \" "
-      resultCandidat+= note
-      resultCandidat+="\"\n"
-      resultCandidat+="\"responses\" : ["
+const socket = io.connect('http://localhost:2000');
 
-  let resultQuestion = ""
-  let reponseIsTrue = false
+socket.emit('message', 'J\'ai renseigné mon nom et prénom, je vais pouvoir faire le questionnaire');
+const questionBloc = document.querySelector('#question');
+const answerBloc = document.querySelector('#answer');
+const suivant = document.querySelector("#suivant");
+let currentQcm = {};
+let resultCandidat = {};
+let questionNumber = 0;
+let questionTimer;
 
-
-  function timerQuestion() {
-
-    timeleft  = obj[chiffre].time
+const startQuestionTimer = () => {
+  if (currentQcm && currentQcm[questionNumber] && currentQcm[questionNumber].time) {
+    let timeleft = currentQcm[questionNumber].time;
     questionTimer = setInterval((timer) => {
-    timeleft--
-    document.querySelector("#countdowntimer").innerHTML = timeleft
-    if(timeleft <= 0)
-      {
-        clearInterval(questionTimer)
-        alert("Temps ecoulé !\n On passe à la question suivant")
-        questionSuivante()
+      timeleft--;
+      document.querySelector("#countdowntimer").innerHTML = timeleft;
+      if (timeleft <= 0) {
+        clearInterval(questionTimer);
+        confirm("Temps ecoulé !\n On passe à la question suivant");
+        nextQuestion();
       }
-    },1000);
+    }, 1000);
+  }
+}
+
+
+const writeQuestion = () => {
+
+  startQuestionTimer();
+  questionBloc.innerHTML = currentQcm[questionNumber].question;
+  while (answerBloc.firstChild) {
+    answerBloc.removeChild(answerBloc.firstChild);
   }
 
-
-  function writeQuestion() {
-
-    timerQuestion()
-    bloc.innerHTML = obj[chiffre].question
-    if(obj[chiffre].type == 'choice')
-    {
-        function logArrayElements(element, index, array) {
-          let radio = document.createElement('INPUT')
-          radio.setAttribute('type', 'radio')
-          radio.setAttribute('value', element)
-          radio.setAttribute('name', 'nom')
-          let txt = document.createTextNode(element)
-          bloc.appendChild(radio)
-          bloc.appendChild(txt)
-        }
-        obj[chiffre].choices.forEach(logArrayElements);
-
-    }
-
-    if(obj[chiffre].type == 'free')
-    {
+  switch (currentQcm[questionNumber].type) {
+    case ('choice'):
+      const writeRadioAnswer = (element, index, array) => {
+        let radio = document.createElement('INPUT')
+        radio.setAttribute('type', 'radio')
+        radio.setAttribute('value', element)
+        radio.setAttribute('name', 'nom')
+        let txt = document.createTextNode(element)
+        answerBloc.appendChild(radio)
+        answerBloc.appendChild(txt)
+      }
+      currentQcm[questionNumber].choices.forEach(writeRadioAnswer);
+      break;
+    case ('free'):
       let inputT = document.createElement('INPUT')
-              inputT.setAttribute('type', 'text')
-              inputT.setAttribute('id', 'repText')
-              bloc.appendChild(inputT)
-    }
+      inputT.setAttribute('type', 'text')
+      inputT.setAttribute('id', 'repText')
+      questionBloc.appendChild(inputT)
+      break;
   }
+}
 
 
-
-  function checkAnswer(){
+const checkAnswer = () => {
+  const resultQuestion = {
+    'question': currentQcm.question,
+    'success': false,
+    'answer': ''
+  };
+  resultQuestion.question = currentQcm[questionNumber].question;
+  switch (currentQcm[questionNumber].type) {
     // Pour les question a choix multiple
-    if(obj[chiffre].type == 'choice')
-    {
-      for(let i=0; i<bloc.childElementCount; i++)
-      {
-         if (bloc.children[i].checked == true)
-           {
-             //alert(obj[chiffre].responses.length)
-             for (let k=0; k<obj[chiffre].responses.length; k++)
-             {
-               if ((bloc.children[i].value ) == obj[chiffre].responses[k])
-               {
-                 reponseIsTrue= true
-                 success++
-               }
-             }
-
-
-             resultQuestion += "\n{\n\t\"question\" : \"  "
-             resultQuestion += obj[chiffre].question
-             resultQuestion+= "\" "+
-                              "\n\t\"success\" : "
-             resultQuestion+= reponseIsTrue
-             resultQuestion+="\n\t\"responses\" : [\n\t\t"
-
-             resultQuestion += bloc.children[i].value
-             resultQuestion += "\n\t ] \n}"
-           }
-      }
-    }
-    // Pour les question free
-    if(obj[chiffre].type == 'free')
-    {
-
-      for (let k=0; k<obj[chiffre].responses.length; k++)
-      {
-        if ((document.querySelector("#repText").value ) == obj[chiffre].responses[k])
-        {
-          reponseIsTrue= true
-          success++
+    case 'choice':
+      for (let i = 0; i < answerBloc.childElementCount; i++) {
+        if (answerBloc.children[i].checked == true) {
+          resultQuestion.answer = answerBloc.children[i].value;
+          for (let k = 0; k < currentQcm[questionNumber].responses.length; k++) {
+            if ((answerBloc.children[i].value) == currentQcm[questionNumber].responses[k]) {
+              resultQuestion.success = true;
+            }
+          }
         }
       }
+      break;
 
-      resultQuestion += "\n{\n\t\"question\" : \"  "
-      resultQuestion += obj[chiffre].question
-      resultQuestion+= "\" "+
-                       "\n\t\"success\" : "
-      resultQuestion+= reponseIsTrue
-      resultQuestion+="\n\t\"responses\" : [\n\t\t"
-
-      resultQuestion += document.querySelector("#repText").value
-      resultQuestion += "\n\t ] \n}\n\n"
-    }
+    case 'free':
+      for (let k = 0; k < currentQcm[questionNumber].responses.length; k++) {
+        if (document.querySelector("#repText").value.toUpperCase() == currentQcm[questionNumber].responses[k].toUpperCase()) {
+          resultQuestion.success = true;
+        }
+      }
+      resultQuestion.answer = document.querySelector("#repText").value;
+      break;
   }
+  return resultQuestion;
+}
 
-  function questionSuivante(){
+const nextQuestion = () => {
+  clearInterval(questionTimer);
+  resultCandidat.answers.push(checkAnswer());
 
-    checkAnswer();
-    if (chiffre +1  >= obj.length ){
-      document.querySelector("#countdowntimer").style.display = "none"
-      suivant.value = "Terminé"
-      bloc.innerHTML = "C'est fini"
-      note = success / obj.length * 100
-      alert('Votre note est ' + note + '%')
-    }
-    resultCandidat += resultQuestion
-    socket.emit('resultCandidat', resultCandidat)
-    alert(resultCandidat)
-    clearInterval(questionTimer)
-    chiffre++
-    writeQuestion()
+  if (questionNumber + 1 >= currentQcm.length) {
+    document.querySelector("#countdowntimer").style.display = "none"
+    suivant.value = "Terminé"
+    questionBloc.innerHTML = "C'est fini"
+    const success = resultCandidat.answers.filter(x => x.success === true).length;
+    resultCandidat.score = success / currentQcm.length * 100
+    alert('Votre note est ' + resultCandidat.score + '%');
+  } else {
+    alert(JSON.stringify(resultCandidat, null, 2));
+    questionNumber++;
+    writeQuestion();
   }
-  writeQuestion()
-  suivant.addEventListener('click',questionSuivante)
+}
+
+
+socket.on('qcm', (qcm) => {
+  currentQcm = qcm;
+  resultCandidat = {
+    'name': 'John Doe',
+    'date': Date.now(),
+    'score': 0,
+    'answers': []
+  };
+
+  writeQuestion();
+  suivant.addEventListener('click', nextQuestion)
 })

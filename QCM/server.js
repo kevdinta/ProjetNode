@@ -1,19 +1,21 @@
 'use strict'
 
-let http = require('http')
-let express = require('express')
-let app = express()
-let fs= require('fs')
-let data = fs.readFileSync('public/json/example.json')
-let obj = JSON.parse(data)
+let http = require('http');
+let express = require('express');
+let io = require('socket.io')();
+let app = express();
+let fs= require('fs');
+let data = fs.readFileSync('public/json/example.json');
+let obj = JSON.parse(data);
 
 app.use(express.static(__dirname + '/public'));
 const port = 2000
 
 let serveur = http.createServer(app)
+io.listen(serveur);
 
 // Connexion socket
-let io = require('socket.io').listen(serveur)
+
 
 app.set('view engine', 'pug')
 app.get('/', (req, res) => {
