@@ -2,22 +2,22 @@
 /* global document, window, io, swal */
 'use strict';
 
-var socket = io.connect('http://localhost:2000');
+const socket = io.connect('http://localhost:2000');
 socket.emit('requestQcm');
 
 socket.emit('message', 'J\'ai renseigné mon nom et prénom, je vais pouvoir faire le questionnaire');
-var questionBloc = document.querySelector('#question');
-var answerBloc = document.querySelector('#answer');
-var nextQuestionButton = document.querySelector('#suivant');
-var currentQcm = {};
-var resultCandidat = {};
-var questionNumber = 0;
-var questionTimer = void 0;
+const questionBloc = document.querySelector('#question');
+const answerBloc = document.querySelector('#answer');
+const nextQuestionButton = document.querySelector('#suivant');
+let currentQcm = {};
+let resultCandidat = {};
+let questionNumber = 0;
+let questionTimer;
 
-var startQuestionTimer = function startQuestionTimer() {
+const startQuestionTimer = () => {
   if (currentQcm && currentQcm[questionNumber] && currentQcm[questionNumber].time) {
-    var timeleft = currentQcm[questionNumber].time;
-    questionTimer = setInterval(function (timer) {
+    let timeleft = currentQcm[questionNumber].time;
+    questionTimer = setInterval((timer) => {
       timeleft--;
       document.querySelector('#countdowntimer').innerHTML = timeleft;
       if (timeleft <= 0) {
@@ -26,8 +26,8 @@ var startQuestionTimer = function startQuestionTimer() {
           title: 'Temps écoulé',
           text: 'On passe a la question suivante',
           type: 'error',
-          confirmButtonText: 'Ok'
-        }).then(function (res) {
+          confirmButtonText: 'Ok',
+        }).then((res) => {
           console.log('ok');
           nextQuestion();
         });
@@ -36,25 +36,26 @@ var startQuestionTimer = function startQuestionTimer() {
   }
 };
 
-var writeQuestion = function writeQuestion() {
+
+const writeQuestion = () => {
   startQuestionTimer();
   questionBloc.innerHTML = currentQcm[questionNumber].question;
 
   switch (currentQcm[questionNumber].type) {
-    case 'choice':
-      var writeRadioAnswer = function writeRadioAnswer(element, index, array) {
-        var radio = document.createElement('INPUT');
+    case ('choice'):
+      const writeRadioAnswer = (element, index, array) => {
+        let radio = document.createElement('INPUT');
         radio.setAttribute('type', 'radio');
         radio.setAttribute('value', element);
         radio.setAttribute('name', 'nom');
-        var txt = document.createTextNode(element);
+        let txt = document.createTextNode(element);
         answerBloc.appendChild(radio);
         answerBloc.appendChild(txt);
       };
       currentQcm[questionNumber].choices.forEach(writeRadioAnswer);
       break;
-    case 'free':
-      var inputT = document.createElement('INPUT');
+    case ('free'):
+      let inputT = document.createElement('INPUT');
       inputT.setAttribute('type', 'text');
       inputT.setAttribute('id', 'repText');
       answerBloc.appendChild(inputT);
@@ -62,21 +63,22 @@ var writeQuestion = function writeQuestion() {
   }
 };
 
-var checkAnswer = function checkAnswer() {
-  var resultQuestion = {
+
+const checkAnswer = () => {
+  const resultQuestion = {
     question: currentQcm.question,
     success: false,
-    answer: ''
+    answer: '',
   };
   resultQuestion.question = currentQcm[questionNumber].question;
   switch (currentQcm[questionNumber].type) {
     // Pour les question a choix multiple
     case 'choice':
-      for (var i = 0; i < answerBloc.childElementCount; i++) {
+      for (let i = 0; i < answerBloc.childElementCount; i++) {
         if (answerBloc.children[i].checked === true) {
           resultQuestion.answer = answerBloc.children[i].value;
-          for (var k = 0; k < currentQcm[questionNumber].responses.length; k++) {
-            if (answerBloc.children[i].value === currentQcm[questionNumber].responses[k]) {
+          for (let k = 0; k < currentQcm[questionNumber].responses.length; k++) {
+            if ((answerBloc.children[i].value) === currentQcm[questionNumber].responses[k]) {
               resultQuestion.success = true;
             }
           }
@@ -85,8 +87,8 @@ var checkAnswer = function checkAnswer() {
       break;
 
     case 'free':
-      for (var _k = 0; _k < currentQcm[questionNumber].responses.length; _k++) {
-        if (document.querySelector('#repText').value.toUpperCase() === currentQcm[questionNumber].responses[_k].toUpperCase()) {
+      for (let k = 0; k < currentQcm[questionNumber].responses.length; k++) {
+        if (document.querySelector('#repText').value.toUpperCase() === currentQcm[questionNumber].responses[k].toUpperCase()) {
           resultQuestion.success = true;
         }
       }
@@ -96,7 +98,7 @@ var checkAnswer = function checkAnswer() {
   return resultQuestion;
 };
 
-var nextQuestion = function nextQuestion() {
+const nextQuestion = () => {
   clearInterval(questionTimer);
   resultCandidat.answers.push(checkAnswer());
   while (answerBloc.firstChild) {
@@ -106,16 +108,14 @@ var nextQuestion = function nextQuestion() {
     document.querySelector('#countdowntimer').style.display = 'none';
     nextQuestionButton.value = 'Terminé';
     questionBloc.innerHTML = "C'est fini";
-    var success = resultCandidat.answers.filter(function (x) {
-      return x.success === true;
-    }).length;
+    const success = resultCandidat.answers.filter(x => x.success === true).length;
     resultCandidat.score = success / currentQcm.length * 100;
     socket.emit('saveUserResult', resultCandidat);
     swal({
       title: 'QCM terminé',
-      text: 'Votre score est ' + resultCandidat.score + ' %',
+      text: `Votre score est ${resultCandidat.score} %`,
       type: 'success',
-      confirmButtonText: 'Cool!'
+      confirmButtonText: 'Cool!',
     });
   } else {
     // alert(JSON.stringify(resultCandidat, null, 2));
@@ -124,16 +124,17 @@ var nextQuestion = function nextQuestion() {
   }
 };
 
-socket.on('qcm', function (qcm) {
+
+socket.on('qcm', (qcm) => {
   currentQcm = qcm;
-  var user = JSON.parse(window.localStorage.getItem('user'));
+  const user = JSON.parse(window.localStorage.getItem('user'));
   if (user) {
     resultCandidat = {
       firstName: user.firstName,
       lastName: user.lastName,
       date: Date.now(),
       score: 0,
-      answers: []
+      answers: [],
     };
 
     writeQuestion();
@@ -143,9 +144,10 @@ socket.on('qcm', function (qcm) {
       title: 'Oops',
       text: 'Un erreur est survenu, veuillez reessayer',
       type: 'error',
-      confirmButtonText: 'Ok'
-    }).then(function (res) {
+      confirmButtonText: 'Ok',
+    }).then((res) => {
       window.location.href = '/';
     });
   }
+
 });
