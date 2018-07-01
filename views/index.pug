@@ -1,7 +1,7 @@
 html
   head
     title= title
-    head
+    head      
       link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
   body
     div.container
@@ -10,10 +10,12 @@ html
       div.col-xs-12
         div.row
           div.jumbotron
-            form(method='POST', action='/play', class='form-group')
+            form(method='POST', action='/play', class='form-group', name='form')
               label(for='prenom') Prenom
               input(type='text', class='form-control', id='prenom', placeholder='Votre prénom', required)
               label(for='nom') Nom
               input(type='text', class='form-control', id='nom', placeholder='Votre nom', required)
               br
-              input(type='submit', class='btn btn-warning form-control', value='S\'enregistrer', id='enregistrer')
+              input(type='submit', class='btn btn-warning form-control', value='S\'enregistrer', id='register')
+    script(src='/socket.io/socket.io.js')
+    script(src='js/register.js')

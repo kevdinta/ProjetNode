@@ -1,9 +1,10 @@
 const socket = io.connect('http://localhost:2000');
+socket.emit('requestQcm');
 
 socket.emit('message', 'J\'ai renseigné mon nom et prénom, je vais pouvoir faire le questionnaire');
 const questionBloc = document.querySelector('#question');
 const answerBloc = document.querySelector('#answer');
-const suivant = document.querySelector("#suivant");
+const nextQuestionButton = document.querySelector("#suivant");
 let currentQcm = {};
 let resultCandidat = {};
 let questionNumber = 0;
@@ -17,8 +18,16 @@ const startQuestionTimer = () => {
       document.querySelector("#countdowntimer").innerHTML = timeleft;
       if (timeleft <= 0) {
         clearInterval(questionTimer);
-        confirm("Temps ecoulé !\n On passe à la question suivant");
-        nextQuestion();
+        swal({
+          title: 'Temps écoulé',
+          text: 'On passe a la question suivante',
+          type: 'error',
+          confirmButtonText: 'Ok'
+        }).then((res) => {
+          console.log('ok')
+          nextQuestion();
+        })
+
       }
     }, 1000);
   }
@@ -96,28 +105,36 @@ const nextQuestion = () => {
 
   if (questionNumber + 1 >= currentQcm.length) {
     document.querySelector("#countdowntimer").style.display = "none"
-    suivant.value = "Terminé"
+    nextQuestionButton.value = "Terminé"
     questionBloc.innerHTML = "C'est fini"
     const success = resultCandidat.answers.filter(x => x.success === true).length;
     resultCandidat.score = success / currentQcm.length * 100
-    alert('Votre note est ' + resultCandidat.score + '%');
+    socket.emit('saveUserResult', resultCandidat);
+    swal({
+      title: 'QCM terminé',
+      text: `Votre score est ${resultCandidat.score} %`,
+      type: 'success',
+      confirmButtonText: 'Cool!'
+    });    
   } else {
-    alert(JSON.stringify(resultCandidat, null, 2));
+    console.log(resultCandidat)
+    // alert(JSON.stringify(resultCandidat, null, 2));
     questionNumber++;
     writeQuestion();
   }
 }
 
 
-socket.on('qcm', (qcm) => {
+socket.on('qcm', (qcm, user) => {
   currentQcm = qcm;
   resultCandidat = {
-    'name': 'John Doe',
+    'firstName': user.firstName,
+    'lastName': user.lastName,
     'date': Date.now(),
     'score': 0,
     'answers': []
   };
 
   writeQuestion();
-  suivant.addEventListener('click', nextQuestion)
+  nextQuestionButton.addEventListener('click', nextQuestion)
 })

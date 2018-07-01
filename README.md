@@ -12,5 +12,5 @@ npm start
 - Sur ce QCM, il y aura un timer, vous devez répondre aux questions, une seule réponse possible demandé
 - Si vous souhaitez upload, redirigez-vous sur cette adresse : localhost:2000/upload
 
-Il est également possible de voir les résultats de chaque candidat dans le dossier upload.
-Chaque QCM remplit par un candidat génèrera un fichier .JSON avec ses réponses
+Tous les QCM uploadé sont dans le dossier `uploads`
+Tous les  fichiers de réponses sont dans le dossier `results`
