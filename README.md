@@ -1,9 +1,9 @@
 # QCM node app
 
 ```bash
-# Installeles dépendences du projet
+# Installe les dépendances du projet
 npm install
-# Lance  l'application
+# Transpile les sources et lance  l'application
 npm start
 ```
 
@@ -13,4 +13,5 @@ npm start
 - Si vous souhaitez upload, redirigez-vous sur cette adresse : localhost:2000/upload
 
 Tous les QCM uploadé sont dans le dossier `uploads`
+
 Tous les  fichiers de réponses sont dans le dossier `results`

@@ -128,10 +128,13 @@ socket.on('qcm', function (qcm) {
   currentQcm = qcm;
   var user = JSON.parse(window.localStorage.getItem('user'));
   if (user) {
+    var d = new Date();
+    var dateString = d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + '@' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+    console.log(dateString);
     resultCandidat = {
       firstName: user.firstName,
       lastName: user.lastName,
-      date: Date.now(),
+      date: dateString,
       score: 0,
       answers: []
     };

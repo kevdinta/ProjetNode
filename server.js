@@ -55,8 +55,8 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('saveUserResult', (resultCandidat) => {
-    console.log(resultCandidat);
-    fs.writeFile(`./results/${resultCandidat.firstName}_${resultCandidat.lastName}_${resultCandidat.date}.json`, JSON.stringify(resultCandidat));
+    fs.writeFile(`./results/${resultCandidat.firstName}_${resultCandidat.lastName}_${resultCandidat.date}.json`,
+      JSON.stringify(resultCandidat));
   });
 
 });

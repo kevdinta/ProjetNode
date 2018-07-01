@@ -88,7 +88,8 @@ const checkAnswer = () => {
 
     case 'free':
       for (let k = 0; k < currentQcm[questionNumber].responses.length; k++) {
-        if (document.querySelector('#repText').value.toUpperCase() === currentQcm[questionNumber].responses[k].toUpperCase()) {
+        if (document.querySelector('#repText').value.toUpperCase()
+        === currentQcm[questionNumber].responses[k].toUpperCase()) {
           resultQuestion.success = true;
         }
       }
@@ -129,10 +130,12 @@ socket.on('qcm', (qcm) => {
   currentQcm = qcm;
   const user = JSON.parse(window.localStorage.getItem('user'));
   if (user) {
+    var d = new Date();
+    const dateString = `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}@${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
     resultCandidat = {
       firstName: user.firstName,
       lastName: user.lastName,
-      date: Date.now(),
+      date: dateString,
       score: 0,
       answers: [],
     };
