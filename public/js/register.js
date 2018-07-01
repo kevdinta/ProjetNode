@@ -1,5 +1,5 @@
 
-const registerButton = document.querySelector('#register');
+const form = document.querySelector('#form');
 
 const registerUser = () => {
   const socket = io.connect('localhost:2000');
@@ -7,8 +7,7 @@ const registerUser = () => {
     firstName : document.querySelector('#prenom').value,
     lastName : document.querySelector('#nom').value,
   };
-  console.log(user)
-  socket.emit('userRegister', user);
+  window.localStorage.setItem('user', JSON.stringify(user));
 }
 
-registerButton.addEventListener('click', registerUser);
+form.addEventListener('submit', registerUser);

@@ -11,7 +11,6 @@ const server = http.createServer(app);
 io.listen(server);
 
 const questionnaire = JSON.parse(fs.readFileSync('public/json/example.json'));
-let storedUser = {};
 
 // Connexion socket
 app.set('view engine', 'pug');
@@ -47,16 +46,12 @@ io.sockets.on('connection', (socket) => {
     console.log(message)
   });
 
-  socket.on('userRegister', (user) => {
-    storedUser = user;
-  });
-
   socket.on('uploadJSON', (file) => {
-    fs.writeFile('./uploads/questions.json', file)
+    fs.writeFile(`./uploads/${file.name}`, file)
   });
 
   socket.on('requestQcm', () => {
-    socket.emit('qcm', questionnaire, storedUser);
+    socket.emit('qcm', questionnaire);
   });
 
   socket.on('saveUserResult', (resultCandidat) => {

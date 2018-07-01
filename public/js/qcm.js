@@ -59,7 +59,7 @@ const writeQuestion = () => {
       let inputT = document.createElement('INPUT')
       inputT.setAttribute('type', 'text')
       inputT.setAttribute('id', 'repText')
-      questionBloc.appendChild(inputT)
+      answerBloc.appendChild(inputT)
       break;
   }
 }
@@ -117,7 +117,6 @@ const nextQuestion = () => {
       confirmButtonText: 'Cool!'
     });    
   } else {
-    console.log(resultCandidat)
     // alert(JSON.stringify(resultCandidat, null, 2));
     questionNumber++;
     writeQuestion();
@@ -125,16 +124,29 @@ const nextQuestion = () => {
 }
 
 
-socket.on('qcm', (qcm, user) => {
+socket.on('qcm', (qcm) => {
   currentQcm = qcm;
-  resultCandidat = {
-    'firstName': user.firstName,
-    'lastName': user.lastName,
-    'date': Date.now(),
-    'score': 0,
-    'answers': []
-  };
+  const user = JSON.parse(window.localStorage.getItem('user'));
+  if(user) {
+    resultCandidat = {
+      'firstName': user.firstName,
+      'lastName': user.lastName,
+      'date': Date.now(),
+      'score': 0,
+      'answers': []
+    };
+  
+    writeQuestion();
+    nextQuestionButton.addEventListener('click', nextQuestion)
+  } else {
+    swal({
+      title: 'Oops',
+      text: 'Un erreur est survenu, veuillez reessayer',
+      type: 'error',
+      confirmButtonText: 'Ok'
+    }).then((res) => {
+      window.location.href = "/";
+    })
+  }
 
-  writeQuestion();
-  nextQuestionButton.addEventListener('click', nextQuestion)
 })
